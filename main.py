@@ -220,7 +220,7 @@ async def fetch_external_tasks() -> List[Dict[str, Any]]:
                     
                 tasks.append({
                     "external_id": item.get("id"),
-                    "title": title[:255],  # ограничим длину
+                    "title": title[:255],
                     "description": None,
                     "done": bool(item.get("completed", False)),
                 })
