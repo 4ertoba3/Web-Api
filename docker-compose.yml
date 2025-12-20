@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  nats:
+    image: nats:2.9-alpine
+    container_name: nats-server
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    command: "-js -m 8222"
+    restart: unless-stopped
+    networks:
+      - weather-network
+
+  weather-api:
+    build: .
+    container_name: weather-api
+    ports:
+      - "8000:8000"
+    depends_on:
+      - nats
+    environment:
+      - NATS_URL=nats://nats:4222
+      - DATABASE_URL=sqlite+aiosqlite:///./weather.db
+      - BACKGROUND_INTERVAL_SECONDS=60
+      - CITIES=["Москва","Санкт-Петербург","Новосибирск","Екатеринбург"]
+    volumes:
+      - ./weather.db:/app/weather.db
+    restart: unless-stopped
+    networks:
+      - weather-network
+
+networks:
+  weather-network:
+    driver: bridge
